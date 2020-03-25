@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>登入 - layuiAdmin</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static "layui/css/layui.css" %}" media="all">
+  <link rel="stylesheet" href="{% static "css/admin.css" %}" media="all">
+  <link rel="stylesheet" href="{% static "css/login.css" %}" media="all">
+</head>
+<body>
+
+  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+      <div class="layadmin-user-login-box layadmin-user-login-header">
+        <h2>登录界面</h2>
+        <p>资产登记管理系统</p>
+      </div>
+      <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+          {% csrf_token %}
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+          <input type="text" name="user_code" id="LAY-user-login-username" lay-verify="required" placeholder="用户名" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+          <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" placeholder="密码" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-row">
+            <div class="layui-col-xs7">
+              <label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="LAY-user-login-vercode"></label>
+              <input type="text" name="captcha_1" id="id_reg_captcha_1" lay-verify="required" placeholder="图形验证码" class="layui-input">
+                <input id="id_reg_captcha_0" name="captcha_0" type="hidden" value="{{ hash_key }}">
+            </div>
+            <div class="layui-col-xs5">
+              <div style="margin-left: 10px;">
+                <img src="{{ image_url }}" class="layadmin-user-login-codeimg" id="LAY-user-get-vercode">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="layui-form-item" style="margin-bottom: 20px;">
+          <input type="checkbox" name="remember" lay-skin="primary" title="记住密码">
+          <a href="forget.html" class="layadmin-user-jump-change layadmin-link" style="margin-top: 7px;">忘记密码？</a>
+        </div>
+        <div class="layui-form-item">
+          <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">登 入</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="layui-trans layadmin-user-login-footer">
+      <p>© 2020 <a href="https://www.crazyfang.cn/" target="_blank">crazyfang.cn</a></p>
+    </div>
+    
+    <!--<div class="ladmin-user-login-theme">
+      <script type="text/html" template>
+        <ul>
+          <li data-theme=""><img src="{{ layui.setter.base }}style/res/bg-none.jpg"></li>
+          <li data-theme="#03152A" style="background-color: #03152A;"></li>
+          <li data-theme="#2E241B" style="background-color: #2E241B;"></li>
+          <li data-theme="#50314F" style="background-color: #50314F;"></li>
+          <li data-theme="#344058" style="background-color: #344058;"></li>
+          <li data-theme="#20222A" style="background-color: #20222A;"></li>
+        </ul>
+      </script>
+    </div>-->
+    
+  </div>
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'layui/layui.js' %}"></script>
+  <script src="{% static 'js/csrf.js' %}"></script>
+  <script>
+  layui.use(['layer', 'form', 'jquery'], function(){
+    var $ = layui.$
+    ,form = layui.form
+      ,layer = layui.layer;
+
+    form.render();
+
+    $('#LAY-user-get-vercode').on('click', function () {
+        $.getJSON("{% url 'captcha-refresh' %}", function(json) {
+          // This should update your captcha image src and captcha hidden input
+          // debugger;
+          var new_cptch_key = json['key'];
+          var new_cptch_image = json['image_url'];
+          id_captcha_0 = $("#id_reg_captcha_0");
+          img = $("#LAY-user-get-vercode");
+          id_captcha_0.attr("value", new_cptch_key);
+          img.attr("src", new_cptch_image);
+      });
+    });
+
+    //提交
+    form.on('submit(LAY-user-login-submit)', function(obj) {
+        $.ajax({
+            url:'{% url 'user:login' %}',
+            type:'post',
+            dataType:'json',
+            data:{'user_code':$('#LAY-user-login-username').val(),
+                  'password':$('#LAY-user-login-password').val(),
+                  'captcha_1':$('#id_reg_captcha_1').val(),
+                  'captcha_0':$('#id_reg_captcha_0').val()},
+            success:function (data) {
+                console.log(data)
+                if(data.state === 'success')
+                {
+                    layer.msg('登录成功!');
+                }
+                else{
+                    layer.msg('登录失败!');
+                }
+            }
+        });
+    });
+  });
+  </script>
+</body>
+</html>
