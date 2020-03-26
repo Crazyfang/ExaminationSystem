@@ -3,9 +3,10 @@ from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 import json
-from .form import UserForm
+from .form import UserForm, UserFormRegister
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
+from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 
@@ -17,15 +18,11 @@ def login_view(request):
         return render(request, 'myuser/login.html', {'hash_key': hash_key, 'image_url': image_url})
     else:
         user = UserForm(request.POST)
-        print(request.POST)
 
         user_code = request.POST.get('user_code', '')
         password = request.POST.get('password', '')
-        print(user.is_valid())
-        print(user.cleaned_data)
-        print(user.errors)
-        user = authenticate(user_code=user_code, password=password)
-        if user is not None and user.is_active:
+
+        if user.is_valid():
             # Correct password, and the user is marked "active"
             login(request, user)
             data = {'state': 'success'}
@@ -34,8 +31,29 @@ def login_view(request):
             # return redirect("/user/index")
         else:
             data = {'state': 'fail'}
-            return HttpResponse(data)
+            return HttpResponse(json.dumps(data))
             # return redirect("/user/login")
+
+
+def register_view(request):
+    if request.method == 'GET':
+        hash_key = CaptchaStore.generate_key()
+        image_url = captcha_image_url(hash_key)
+        forms = UserFormRegister()
+        return render(request, 'myuser/reg.html', {'hash_key': hash_key, 'image_url': image_url, 'forms': forms})
+    elif request.method == 'POST':
+        user = UserFormRegister(request.POST)
+        data = {'state': 'success', 'url': reverse('user:login')}
+
+        if user.is_valid():
+            new_user = user.save(commit=False)
+            new_user.set_password(user.cleaned_data['password'])
+            new_user.save()
+            return HttpResponse(json.dumps(data))
+
+        else:
+            data = {'state': 'fail', 'msg': user.errors}
+            return HttpResponse(json.dumps(data))
 
 
 @login_required()

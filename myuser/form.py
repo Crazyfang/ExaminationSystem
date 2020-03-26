@@ -11,3 +11,16 @@ class UserForm(ModelForm):
     class Meta:
         model = User
         fields = ['password']
+
+
+class UserFormRegister(ModelForm):
+    captcha = CaptchaField()
+    # gender = forms.ChoiceField()
+    # gender = forms.Select(attrs={'id': 'LAY-user-login-gender'}, choices=((1, '男'), (2, '女')))
+
+    class Meta:
+        model = User
+        fields = ['user_code', 'password', 'username', 'gender']
+        widgets = {
+            'gender': forms.Select(attrs={'id': 'LAY-user-login-gender'})
+        }
