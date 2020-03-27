@@ -6,7 +6,6 @@ import json
 from .form import UserForm, UserFormRegister
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
-from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 
@@ -19,12 +18,10 @@ def login_view(request):
     else:
         user = UserForm(request.POST)
 
-        user_code = request.POST.get('user_code', '')
-        password = request.POST.get('password', '')
-
         if user.is_valid():
+            login_user = authenticate(**user.cleaned_data)
             # Correct password, and the user is marked "active"
-            login(request, user)
+            login(request, login_user)
             data = {'state': 'success'}
             # Redirect to a success page.
             return HttpResponse(json.dumps(data))
