@@ -55,8 +55,8 @@ def register_view(request):
 
 @login_required()
 def index_view(request):
+    print(request.user.department)
     print(request.user.user_code)
-    print(request.user)
 
     return render(request, 'myuser/index.html')
 
