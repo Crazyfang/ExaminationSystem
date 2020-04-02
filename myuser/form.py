@@ -24,3 +24,22 @@ class UserFormRegister(ModelForm):
         widgets = {
             'gender': forms.Select(attrs={'id': 'LAY-user-login-gender'})
         }
+
+
+class UserFormAdd(ModelForm):
+    class Meta:
+        model = User
+        fields = ['user_code', 'username', 'gender', 'department']
+        error_messages = {
+            'user_code': {
+                'unique': "存在具有相同柜员号的用户",
+            },
+        }
+
+
+class UserFormEdit(ModelForm):
+    user_code = forms.CharField(max_length=10, help_text='柜员号')
+
+    class Meta:
+        model = User
+        fields = ['username', 'gender', 'department']

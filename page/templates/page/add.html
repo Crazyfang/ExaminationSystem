@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加界面</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {% load static %}
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}" media="all">
+    <link rel="stylesheet" href="{% static 'css/dtree/dtree.css' %}" media="all">
+    <link rel="stylesheet" href="{% static 'css/dtree/font/dtreefont.css' %}" media="all">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">
+</head>
+<body>
+{% csrf_token %}
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-sm12">
+            <form class="layui-form" action="">
+                <input type="hidden" name="parent" value="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">上级界面</label>
+                    <div class="layui-input-inline">
+                        <ul id="selTree" class="dtree" data-id="0"></ul>
+                    </div>
+                    <button type="button" class="layui-btn" lay-filter="clear_parent" id="clear_parent">
+                        设为导航界面
+                    </button>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.menu_name.help_text }}</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="menu_name" lay-verify="required" autocomplete="off"
+                               placeholder="菜单名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.menu_url.help_text }}</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="menu_url" lay-verify="required" placeholder="链接"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.order_no.help_text }}</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="order_no" lay-verify="required" placeholder="排序号"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.status.help_text }}</label>
+                    <div class="layui-input-block">
+                        {{ form.status }}
+                    </div>
+                </div>
+                <div class="layui-form-item layui-hide">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit_btn" id="submit_btn">
+                        立即提交
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="{% static 'layui/layui.js' %}"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/csrf.js' %}"></script>
+<script>
+    layui.config({
+        base: '{% static '' %}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'dtree', 'form', 'element'], function () {
+        var $ = layui.$,
+            form = layui.form,
+            dtree = layui.dtree,
+            element = layui.element;
+
+        var DemoTree = dtree.renderSelect({
+            elem: "#selTree",
+            width: "100%", // 指定树的宽度
+            response: {message: "msg", statusCode: 0},
+            dataStyle: "layuiStyle",
+            selectCardHeight: '150',
+            method: 'GET',
+            url: "{% url 'page:page_tree' %}"
+        });
+
+        dtree.on("node('selTree')", function (obj) {
+            $('input[name="parent"]').val(obj.param.nodeId);
+        });
+
+        $('#clear_parent').click(function () {
+            DemoTree.selectResetVal();
+            $('input[name="parent"]').val('');
+        });
+    });
+</script>
+</body>
+</html>

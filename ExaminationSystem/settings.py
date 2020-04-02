@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'captcha',
     'home',
     'department',
+    'page',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'global_login_required.GlobalLoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'ExaminationSystem.urls'
@@ -155,3 +157,5 @@ STATICFILES_DIRS = (
 )
 
 LOGIN_URL = '/user/login'
+
+INIT_PASSWORD = '123456'

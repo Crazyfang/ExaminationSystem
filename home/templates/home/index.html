@@ -63,13 +63,13 @@
           </li>
           <li class="layui-nav-item" lay-unselect>
             <a href="javascript:;">
-              <cite>贤心</cite>
+              <cite>{{ user.username }}</cite>
             </a>
             <dl class="layui-nav-child">
               <dd><a lay-href="set/user/info.html">基本资料</a></dd>
               <dd><a lay-href="set/user/password.html">修改密码</a></dd>
               <hr>
-              <dd layadmin-event="logout" style="text-align: center;"><a>退出</a></dd>
+              <dd style="text-align: center;"><a class="logout">退出</a></dd>
             </dl>
           </li>
           
@@ -86,7 +86,7 @@
       <div class="layui-side layui-side-menu">
         <div class="layui-side-scroll">
           <div class="layui-logo" lay-href="{% url 'home:console' %}">
-            <span>layuiAdmin</span>
+            <span>资产管理</span>
           </div>
           
           <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
@@ -96,13 +96,13 @@
                 <cite>主页</cite>
               </a>
               <dl class="layui-nav-child">
-                <dd data-name="console" class="layui-this">
-                  <a lay-href="home/console.html">控制台</a>
+                <dd data-name="user" class="layui-this">
+                  <a lay-href="{% url 'user:index' %}">用户设置</a>
                 </dd>
-                <dd data-name="console">
-                  <a lay-href="home/homepage1.html">主页一</a>
+                <dd data-name="page">
+                  <a lay-href="{% url 'page:index_view' %}">页面设置</a>
                 </dd>
-                <dd data-name="console">
+                <dd data-name="department">
                   <a lay-href="{% url 'department:index' %}">部门列表</a>
                 </dd>
               </dl>
@@ -451,7 +451,6 @@
         </div>
       </div>
       
-      
       <!-- 主体内容 -->
       <div class="layui-body" id="LAY_app_body">
         <div class="layadmin-tabsbody-item layui-show">
@@ -470,7 +469,25 @@
     base: '{% static '' %}' //静态资源所在路径
   }).extend({
     index: 'lib/index' //主入口模块
-  }).use('index');
+  }).use(['index', 'layer'], function () {
+      var $ = layui.$,
+      layer = layui.layer;
+
+      $('.logout').click(function () {
+          $.ajax({
+              url:'{% url 'user:logout' %}',
+              dataType:'json',
+              success:function(data){
+                  if(data.state === 'success'){
+                      layer.msg('注销成功!');
+                      setTimeout(function () {
+                        window.location.href = data.url;
+                      }, 1000);
+                  }
+              }
+          })
+      })
+  });
   </script>
 </body>
 </html>

@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .models import Department
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 import json
-from .forms import DepartmentCreateForm
+from .forms import DepartmentCreateForm, DepartmentEditForm
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -26,15 +27,16 @@ def index_view(request):
 
 
 def department_list(request):
-    if request.method == 'POST':
+    if request.method == 'GET':
         return_data = {'code': 0, 'msg': '获取成功', 'data': get_department(None)}
 
         return HttpResponse(json.dumps(return_data))
 
 
-def create_view(request, parent_department):
+def create_view(request):
     if request.method == 'GET':
-        return render(request, 'department/add_department.html', {'parent_department': parent_department})
+        parent_department = request.GET.get('parent_department')
+        return render(request, 'department/add.html', {'parent_department': parent_department})
 
 
 def create_department(request):
@@ -59,4 +61,37 @@ def create_department(request):
             return HttpResponse(json.dumps({'state': 'fail', 'message': department.errors}))
 
 
+def edit_department(request):
+    if request.method == 'GET':
+        department = get_object_or_404(Department, pk=request.GET.get('parent_department'))
+        form = DepartmentEditForm(instance=department)
 
+        return render(request, 'department/edit.html', {'form': form})
+    else:
+        department_code = request.POST.get('department_code')
+        if department_code == request.POST.get('parent_department'):
+            return HttpResponse(json.dumps({'state': 'fail', 'message': '上级部门不能为自身，请重试!'}))
+        else:
+            try:
+                department = Department.objects.get(department_code=department_code)
+                form = DepartmentEditForm(request.POST, instance=department)
+                if form.is_valid():
+                    form.save()
+                    return HttpResponse(json.dumps({'state': 'success', 'message': '档案编辑成功!'}))
+                else:
+                    return HttpResponse(json.dumps({'state': 'fail', 'message': form.errors}))
+            except Department.DoesNotExist:
+                return HttpResponse(json.dumps({'state': 'fail', 'message': '当前编辑的部门已丢失，请刷新后重试!'}))
+
+
+def del_department(request):
+    department_code = request.POST.get('department')
+    if department_code:
+        try:
+            department = Department.objects.get(pk=department_code)
+            department.delete()
+            return HttpResponse(json.dumps({'state': 'success', 'message': '删除成功!'}))
+        except Department.DoesNotExist:
+            return HttpResponse(json.dumps({'state': 'fail', 'message': '想要删除的部门不存在，请重试!'}))
+    else:
+        return HttpResponse(json.dumps({'state': 'fail', 'message': '当前服务器接收到的部门编号为空，请重试!'}))

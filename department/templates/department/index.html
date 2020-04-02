@@ -24,17 +24,13 @@
               <a href="javascript:;" class="layui-btn layui-btn-primary">增加</a>
               <a href="javascript:;" class="layui-btn layui-btn-primary">删除</a>
               <a href="javascript:;" class="layui-btn layui-btn-primary">编辑</a>
+              <a href="javascript:;" class="layui-btn layui-btn-primary">取消选中</a>
             </div>
           </div>
           <div class="layui-card-body">
             <div class="layui-row">
-              <div class="layui-col-sm12">
+              <div class="layui-col-sm12" style="height: 550px;overflow: auto">
                   <ul id="commonTree0" class="dtree" data-id="0"></ul>
-{#                  <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-pagetwo">#}
-{#                    <div carousel-item id="LAY-index-pagetwo">#}
-{#                      <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>#}
-{#                    </div>#}
-{#                  </div>#}
               </div>
             </div>
           </div>
@@ -62,6 +58,8 @@
           elem: "#commonTree0",
           dataStyle: "layuiStyle",  //使用layui风格的数据格式
           response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+          width: "100%",
+          method:'GET',
           {#data: commonTree0,#}
           url:'{% url 'department:department_list' %}'
         });
@@ -71,9 +69,10 @@
 
             if($(this).text() === '增加'){
                 if(!$.isEmptyObject(param)){
+                    console.log(param);
                     layer.open({
                         type:2,
-                        content:'{% url 'department:create_view' 828010 %}',
+                        content:'{% url 'department:create_view' %}?parent_department=' + param.nodeId,
                         offset:'auto',
                         area:['500px', '300px'],
                         shadeClose:true
@@ -82,7 +81,7 @@
                 else{
                     layer.open({
                         type:2,
-                        content:'{% url 'department:create_view' 0 %}',
+                        content:'{% url 'department:create_view' %}?parent_department=0',
                         offset:'auto',
                         area:['500px', '300px'],
                         shadeClose:true
@@ -91,10 +90,53 @@
             }
             else if($(this).text() === '编辑')
             {
-                layer.msg('编辑!');
+                if(!$.isEmptyObject(param))
+                {
+                    layer.open({
+                        type:2,
+                        content:'{% url 'department:edit_department' %}?parent_department='+param.nodeId,
+                        offset:'auto',
+                        area:['500px', '300px'],
+                        shadeClose:true
+                    })
+                }
+                else{
+                    layer.msg('请选中节点进行编辑!');
+                }
+            }
+            else if($(this).text() === '删除'){
+                if(!$.isEmptyObject(param))
+                {
+                    layer.confirm('确定删除当前 '+ param.context +'？', {
+                      btn: ['确定','取消'] //按钮
+                    }, function(){
+                      $.ajax({
+                         url:'{% url 'department:del_department' %}',
+                         type:'post',
+                         dataType:'json',
+                         data:{'department': param.nodeId},
+                         success:function (data) {
+                            if(data.state === 'success'){
+                                layer.msg('删除成功!');
+                                setTimeout(function () {
+                                    layer.closeAll();
+                                }, 1000);
+                            }
+                            else{
+                                layer.msg(data.message);
+                            }
+                         }
+                      });
+                    }, function(){
+
+                      });
+                }
+                else{
+                    layer.msg('请选中节点进行删除!');
+                }
             }
             else{
-                layer.msg('删除!');
+                DemoTree.cancelNavThis();
             }
         });
 
