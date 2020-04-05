@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'home',
     'department',
     'page',
+    'button',
+    'role',
 ]
 
 MIDDLEWARE = [

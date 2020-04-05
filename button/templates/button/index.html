@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>按钮列表</title>
+    <meta name="renderer" content="webkit">
+    {% load static %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}" media="all">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <div style="padding-bottom: 10px;">
+                        <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+            <table id="LAY-button-manage" lay-filter="LAY-button-manage"></table>
+            <script type="text/html" id="bar">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
+                        class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
+                        class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'layui/layui.js' %}"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/csrf.js' %}"></script>
+<script>
+    layui.config({
+        base: '{% static '' %}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'dtree', 'table', 'layer'], function () {
+        var $ = layui.$
+            , form = layui.form
+            , dtree = layui.dtree
+            , layer = layui.layer
+            , table = layui.table;
+
+        table.render({
+            elem: '#LAY-button-manage'
+            , url: '{% url 'button:button_list' %}'
+            , cols: [[
+                {field: 'id', title: 'id', width: 80, type: 'numbers'}
+                , {field: 'button_name', title: '按钮名称'}
+                , {
+                    field: 'button_type', title: '按钮类型', templet: function (d) {
+                        if (d.button_type === 1) {
+                            return '表内';
+                        } else {
+                            return '表外';
+                        }
+                    }, align: 'center'
+                }
+                , {field: 'create_time', title: '创建时间'}
+                , {
+                    field: 'status',
+                    title: '状态',
+                    width: 80,
+                    templet: function (d) {
+                        if (d.status === 1) {
+                            return '启用';
+                        } else {
+                            return '未启用';
+                        }
+                    },
+                    align: 'center'
+                }
+                , {field: '', title: '操作', toolbar: "#bar"}
+            ]]
+            , page: true
+            , limit: 30
+            , height: 'full-220'
+            , text: '对不起，加载出现异常！'
+        });
+
+        //监听工具条
+        table.on('tool(LAY-button-manage)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('真的删除按钮么', function (index) {
+                    $.ajax({
+                        url: '{% url 'button:del_button' %}',
+                        type: 'post',
+                        dataType: 'json',
+                        data: {'button_id': data.id},
+                        success: function (data) {
+                            if (data.state === 'success') {
+                                layer.msg(data.message);
+                                setTimeout(function () {
+                                    obj.del();
+                                    layer.close(index);
+                                }, 1000);
+                            } else {
+                                layer.msg(data.message)
+                            }
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {
+                var tr = $(obj.tr);
+
+                layer.open({
+                    type: 2
+                    , title: '编辑按钮'
+                    , content: '{% url 'button:edit_button' %}?button_id='+data.id
+                    , maxmin: true
+                    , area: ['500px', '350px']
+                    , btn: ['确定', '取消']
+                    , yes: function (index, layero) {
+                        var iframeWindow = window['layui-layer-iframe' + index]
+                            , submitID = 'LAY-button-front-submit'
+                            , submit = layero.find('iframe').contents().find('#' + submitID);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                            var field = data.field; //获取提交的字段
+
+                            $.ajax({
+                                url: '{% url 'button:edit_button' %}',
+                                data: field,
+                                dataType: 'json',
+                                type: 'post',
+                                success: function (data) {
+                                    if (data.state === 'success') {
+                                        layer.msg(data.message);
+                                        setTimeout(function () {
+                                            table.reload('LAY-button-manage'); //数据刷新
+                                            layer.close(index); //关闭弹层
+                                        }, 1000);
+                                    } else {
+                                        if (typeof (data.message) === 'object') {
+                                            var msg = '';
+                                            for (var temp in data.message) {
+                                                msg += data.message[temp].join('<br>');
+                                            }
+                                            layer.msg(msg);
+                                        } else {
+                                            layer.msg(data.message)
+                                        }
+                                    }
+                                }
+                            });
+                        });
+
+                        submit.trigger('click');
+                    }
+                    , success: function (layero, index) {
+
+                    }
+                });
+            }
+        });
+
+        //事件
+        var active = {
+            add: function () {
+                layer.open({
+                    type: 2
+                    , title: '添加按钮'
+                    , content: '{% url 'button:add_button' %}'
+                    , maxmin: true
+                    , area: ['480px', '350px']
+                    , btn: ['确定', '取消']
+                    , yes: function (index, layero) {
+                        var iframeWindow = window['layui-layer-iframe' + index]
+                            , submitID = 'LAY-button-front-submit'
+                            , submit = layero.find('iframe').contents().find('#' + submitID);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                            var field = data.field; //获取提交的字段
+
+                            $.ajax({
+                                url: '{% url 'button:add_button' %}',
+                                type: 'post',
+                                dataType: 'json',
+                                data: field,
+                                success: function (data) {
+                                    if (data.state === 'success') {
+                                        layer.msg(data.message);
+                                        setTimeout(function () {
+                                            table.reload('LAY-button-manage'); //数据刷新
+                                            layer.close(index); //关闭弹层
+                                        }, 1000);
+                                    } else {
+                                        if (typeof (data.message) === 'object') {
+                                            var msg = '';
+                                            for (var temp in data.message) {
+                                                msg += data.message[temp].join('<br>');
+                                            }
+                                            layer.msg(msg);
+                                        } else {
+                                            layer.msg(data.message)
+                                        }
+                                    }
+                                }
+                            });
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
+</body>
+</html>
