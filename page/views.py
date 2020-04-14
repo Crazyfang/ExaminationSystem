@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .models import Page
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 import json
+from button.models import Button
 from .forms import PageAddForm, PageEditForm
 
 
@@ -32,7 +33,18 @@ def index_view(request):
     :param request:
     :return: 网页视图
     """
-    return render(request, 'page/index.html')
+    if request.method == 'GET':
+        try:
+            page_code = Page.objects.get(menu_code='page').id
+            button = Button.objects.filter(membership__rolesbutton__role_id=request.user.role.id,
+                                           membership__page_id=page_code)
+            button_external = list(button.filter(button_type=2).values('button_name', 'button_code', 'button_icon'))
+            button_internal = list(button.filter(button_type=1).values('button_name', 'button_code', 'button_icon'))
+            print(button_internal)
+            return render(request, 'page/index.html',
+                          {'button_external': button_external, 'button_internal': button_internal})
+        except Page.DoesNotExist:
+            return HttpResponseNotFound()
 
 
 def page_list(request):
@@ -47,12 +59,16 @@ def page_list(request):
 
         for item in item_all:
             dic = {'id': item.id, 'menu_name': item.menu_name, 'menu_url': item.menu_url,
-                   'create_time': item.create_time,
+                   'menu_code': item.menu_code,
+                   'create_time': item.create_time.strftime('%Y-%m-%d %H:%M:%S'),
                    'status': item.status, 'order_no': item.order_no,
+                   'menu_icon': item.menu_icon,
+                   'button': ','.join(
+                       list(Button.objects.filter(membership__page_id=item.id).values_list('button_name', flat=True))),
                    'parent_id': item.parent_id if item.parent_id else 0}
 
             item_list.append(dic)
-
+        print(item_list)
         return HttpResponse(json.dumps(
             {'code': 0, 'msg': '', 'data': item_list, 'count': len(item_list), 'is': 'true', 'tips': '操作成功!'}, indent=4,
             sort_keys=True, default=str))

@@ -37,10 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'myuser',
+    'department',
     'captcha',
     'home',
-    'department',
+    'myuser',
     'page',
     'button',
     'role',
@@ -153,6 +153,8 @@ CAPTCHA_TIMEOUT = 1  # 超时(minutes)
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'myuser.User'
+
+PUBLIC_PATHS = [r'/captcha/image/(?P<key>\w+)/$', r'/captcha/image/(?P<key>\w+)@2/$', r'/captcha/refresh/$']
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "common_static"),

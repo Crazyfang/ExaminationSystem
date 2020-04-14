@@ -29,7 +29,7 @@ class UserFormRegister(ModelForm):
 class UserFormAdd(ModelForm):
     class Meta:
         model = User
-        fields = ['user_code', 'username', 'gender', 'department']
+        fields = ['user_code', 'username', 'gender', 'department', 'role']
         error_messages = {
             'user_code': {
                 'unique': "存在具有相同柜员号的用户",
@@ -42,4 +42,4 @@ class UserFormEdit(ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'gender', 'department']
+        fields = ['username', 'gender', 'department', 'role']

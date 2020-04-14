@@ -19,7 +19,7 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-sm12">
             <form class="layui-form" action="">
-                <input type="hidden" name="parent" value="{{ form.parent.value }}">
+                <input type="hidden" name="parent" value="{{ form.parent.value|default:'' }}">
                 <div class="layui-form-item">
                     <label class="layui-form-label">上级界面</label>
                     <div class="layui-input-inline">
@@ -38,10 +38,24 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.menu_code.help_text }}</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="menu_code" lay-verify="required" placeholder="菜单代码"
+                               autocomplete="off" class="layui-input" value="{{ form.menu_code.value }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">{{ form.menu_url.help_text }}</label>
                     <div class="layui-input-block">
                         <input type="text" name="menu_url" lay-verify="required" placeholder="链接"
                                autocomplete="off" class="layui-input" value="{{ form.menu_url.value }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <input type="hidden" name="menu_icon" value="">
+                    <label class="layui-form-label">{{ form.menu_icon.help_text }}</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="iconPicker" lay-filter="iconPicker" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -76,10 +90,11 @@
         base: '{% static '' %}' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'dtree', 'form', 'element'], function () {
+    }).use(['index', 'dtree', 'form', 'element', 'iconPicker'], function () {
         var $ = layui.$,
             form = layui.form,
             dtree = layui.dtree,
+            iconPicker = layui.iconPicker,
             element = layui.element;
 
         var DemoTree = dtree.renderSelect({
@@ -101,6 +116,22 @@
             DemoTree.selectResetVal();
             $('input[name="parent"]').val('');
         });
+
+        iconPicker.render({
+            // 选择器，推荐使用input
+            elem: '#iconPicker',
+            // 数据类型：fontClass/unicode，推荐使用fontClass
+            type: 'fontClass',
+            // 是否开启搜索：true/false
+            search: true,
+            // 点击回调
+            click: function (data) {
+                $('input[name="menu_icon"]').val(data.icon);
+                {#console.log(data);#}
+            }
+        });
+
+        iconPicker.checkIcon('iconPicker', '{{ form.menu_icon.value }}');
     });
 </script>
 </body>

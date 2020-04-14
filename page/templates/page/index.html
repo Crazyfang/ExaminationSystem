@@ -9,17 +9,25 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}" media="all">
-    <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">
+{#    <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">#}
 </head>
 <body>
 <div class="layui-fluid">
     <div class="layui-card">
-        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        <div class="layui-form layui-card-header" style="height: auto">
             <div class="layui-form-item">
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-page-add">
-                        <i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>
-                    </button>
+                    {#                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-page-add">#}
+                    {#                        <i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>#}
+                    {#                    </button>#}
+                    {% for button in button_external %}
+                        {% if button.button_code != 'view' %}
+                            <button class="layui-btn" style="margin-top: 10px" data-type="{{ button.button_code }}">
+                                <i class="layui-icon {{ button.button_icon }}"></i>
+                                {{ button.button_name }}
+                            </button>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -27,10 +35,18 @@
         <div class="layui-card-body">
             <table id="tbMenu" lay-filter="LAY-page-manage"></table>
             <script type="text/html" id="bar">
-                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
-                        class="layui-icon layui-icon-edit"></i>编辑</a>
-                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
-                        class="layui-icon layui-icon-delete"></i>删除</a>
+                {#                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i#}
+                {#                        class="layui-icon layui-icon-edit"></i>编辑</a>#}
+                {#                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i#}
+                {#                        class="layui-icon layui-icon-delete"></i>删除</a>#}
+                {#                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="distribute"><i#}
+                {#                        class="layui-icon layui-icon-delete"></i>分配按钮</a>#}
+                {% for button in button_internal %}
+                    <a class="layui-btn {% cycle 'layui-btn-normal' 'layui-btn-danger' %} layui-btn-xs"
+                       lay-event="{{ button.button_code }}">
+                        <i class="layui-icon {{ button.button_icon }}"></i>{{ button.button_name }}
+                    </a>
+                {% endfor %}
             </script>
         </div>
     </div>
@@ -53,20 +69,27 @@
         var treeTable = treeGrid.render({
             id: 'tbReload'
             , elem: '#tbMenu'
-            , height: 'full-112' //高度最大化减去差值
+            , height: 'full-150' //高度最大化减去差值
             , url: '{% url 'page:get_page_list' %}'
             , page: false //开启分页
             , cellMinWidth: 200
-            , idField:'id'
+            , idField: 'id'
             , treeId: 'id'//树形id字段名称
             , treeUpId: 'parent_id'//树形父id字段名称
             , treeShowName: 'menu_name'//以树形式显示的字段
-            , method:'get'
+            , method: 'get'
             , cols: [[ //表头
                 //{ checkbox: true },
                 {field: 'id', title: 'id', width: 80, type: 'numbers'}
                 , {field: 'menu_name', title: '菜单名称'}
                 , {field: 'menu_url', title: '菜单路径'}
+                , {field: 'menu_code', title: '菜单代码'}
+                , {
+                    field: 'menu_icon', title: '菜单图标', templet: function (d) {
+                        return "<i class='layui-icon " + d.menu_icon + "'></i>";
+                    }, align: 'center'
+                }
+                , {field: 'button', title: '拥有按钮'}
                 , {field: 'create_time', title: '创建时间'}
                 , {
                     field: 'status',
@@ -82,7 +105,7 @@
                     align: 'center'
                 }
                 , {field: 'order_no', width: 80, title: '排序号', align: 'center'}
-                , {field: '', title: '操作', toolbar: "#bar"}
+                , {field: '', title: '操作', toolbar: "#bar", width: 230}
             ]]
         });
 
@@ -115,7 +138,7 @@
                     , title: '编辑菜单'
                     , content: '{% url 'page:edit_page' %}?id=' + data.id
                     , maxmin: true
-                    , area: ['500px', '430px']
+                    , area: ['500px', '500px']
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
                         var iframeWindow = window['layui-layer-iframe' + index]
@@ -158,57 +181,70 @@
                         submit.trigger('click');
                     }
                 });
+            } else if (obj.event === 'distribute') {
+                if (data.menu_url === '#') {
+                    layer.msg('母页不允许添加按钮!');
+                } else {
+                    layer.open({
+                        type: 2
+                        , title: '分配按钮'
+                        , content: '{% url 'button:button_distribution' %}?page_id=' + data.id
+                        , maxmin: true
+                        , area: ['500px', '250px']
+                    });
+                }
             }
         });
 
-        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function () {
+        $('.layui-card-header .layui-btn').on('click', function () {
             layer.open({
-                    type: 2
-                    , title: '添加菜单'
-                    , content: '{% url 'page:add_page' %}'
-                    , maxmin: true
-                    , area: ['500px', '400px']
-                    , btn: ['确定', '取消']
-                    , yes: function (index, layero) {
-                        var iframeWindow = window['layui-layer-iframe' + index]
-                            , submitID = 'submit_btn'
-                            , submit = layero.find('iframe').contents().find('#' + submitID);
+                type: 2
+                , title: '添加菜单'
+                , content: '{% url 'page:add_page' %}'
+                , maxmin: true
+                , area: ['500px', '510px']
+                , btn: ['确定', '取消']
+                , yes: function (index, layero) {
+                    var iframeWindow = window['layui-layer-iframe' + index]
+                        , submitID = 'submit_btn'
+                        , submit = layero.find('iframe').contents().find('#' + submitID);
 
-                        //监听提交
-                        iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
-                            var field = data.field; //获取提交的字段
-
-                            $.ajax({
-                                url: '{% url 'page:add_page' %}',
-                                data: field,
-                                dataType: 'json',
-                                type: 'post',
-                                success: function (data) {
-                                    if (data.state === 'success') {
-                                        layer.msg(data.message);
-                                        setTimeout(function () {
-                                            treeGrid.reload('tbReload'); //数据刷新
-                                            layer.close(index); //关闭弹层
-                                        }, 1000);
-                                    } else {
-                                        if (typeof (data.message) === 'object') {
-                                            var msg = '';
-                                            for (var temp in data.message) {
-                                                msg += data.message[temp].join('<br>');
-                                            }
-                                            layer.msg(msg);
-                                        } else {
-                                            layer.msg(data.message)
+                    //监听提交
+                    iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                        var field = data.field; //获取提交的字段
+                        console.log(field);
+                        $.ajax({
+                            url: '{% url 'page:add_page' %}',
+                            data: field,
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.state === 'success') {
+                                    layer.msg(data.message);
+                                    setTimeout(function () {
+                                        treeGrid.reload('tbReload'); //数据刷新
+                                        layer.close(index); //关闭弹层
+                                    }, 1000);
+                                } else {
+                                    if (typeof (data.message) === 'object') {
+                                        var msg = '';
+                                        for (var temp in data.message) {
+                                            msg += data.message[temp].join('<br>');
                                         }
+                                        layer.msg(msg);
+                                    } else {
+                                        layer.msg(data.message)
                                     }
                                 }
-                            });
-                            return false;
+                            }
                         });
 
-                        submit.trigger('click');
-                    }
-                });
+                        return false;
+                    });
+
+                    submit.trigger('click');
+                }
+            });
         });
     });
 </script>

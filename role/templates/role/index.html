@@ -2,57 +2,20 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>用户列表</title>
+    <title>角色列表</title>
     <meta name="renderer" content="webkit">
     {% load static %}
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}" media="all">
-    <link rel="stylesheet" href="{% static 'css/dtree/dtree.css' %}" media="all">
-    <link rel="stylesheet" href="{% static 'css/dtree/font/dtreefont.css' %}" media="all">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">
 </head>
 <body>
 <div class="layui-fluid">
     <div class="layui-card">
-        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
-            <div class="layui-form-item">
-                <div class="layui-inline">
-                    <label class="layui-form-label">柜员号</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="user_code" placeholder="请输入" autocomplete="off" class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">姓名</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="username" placeholder="请输入" autocomplete="off" class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">所属部门</label>
-                    <div class="layui-input-block">
-                        <input type="hidden" name="department" value="">
-                        <ul id="selTree" class="dtree" data-id="0"></ul>
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <label class="layui-form-label">性别</label>
-                    <div class="layui-input-block">
-                        <select name="sex">
-                            <option value="0">不限</option>
-                            <option value="1">男</option>
-                            <option value="2">女</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-user-front-search">
-                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
-                    </button>
-                </div>
-            </div>
+        <div class="layui-card-header layuiadmin-card-header-auto">
+            <p>角色列表</p>
         </div>
 
         <div class="layui-card-body">
@@ -60,26 +23,27 @@
                 {#                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>#}
                 {% for button in button_external %}
                     {% if button.button_code != 'view' %}
-                        <button class="layui-btn layui-btn-lg" data-type="{{ button.button_code }}">
-                            <i class="layui-icon {{ button.button_icon }}"></i>
-                            {{ button.button_name }}
+                        <button class="layui-btn" data-type="{{ button.button_code }}">
+                            <i class="layui-icon {{ button.button_icon }}"></i>{{ button.button_name }}
                         </button>
                     {% endif %}
                 {% endfor %}
             </div>
 
-            <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
+            <table id="LAY-role-manage" lay-filter="LAY-role-manage"></table>
             <script type="text/html" id="table-useradmin-webuser">
-                {#                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i#}
-                {#                        class="layui-icon layui-icon-edit"></i>编辑</a>#}
-                {#                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i#}
-                {#                        class="layui-icon layui-icon-delete"></i>删除</a>#}
                 {% for button in button_internal %}
-                    <a class="layui-btn layui-btn-normal {% cycle 'layui-btn-normal' 'layui-btn-danger' %} layui-btn-xs"
+                    <a class="layui-btn {% cycle 'layui-btn-normal' 'layui-btn-danger' %} layui-btn-xs"
                        lay-event="{{ button.button_code }}">
                         <i class="layui-icon {{ button.button_icon }}"></i>{{ button.button_name }}
                     </a>
                 {% endfor %}
+{#                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i#}
+{#                        class="layui-icon layui-icon-edit"></i>编辑</a>#}
+{#                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i#}
+{#                        class="layui-icon layui-icon-delete"></i>删除</a>#}
+{#                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="distribute"><i#}
+{#                        class="layui-icon layui-icon-delete"></i>分配按钮</a>   #}
             </script>
         </div>
     </div>
@@ -93,47 +57,31 @@
         base: '{% static '' %}' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['index', 'dtree', 'table', 'layer'], function () {
+    }).use(['table', 'layer'], function () {
         var $ = layui.$
             , form = layui.form
-            , dtree = layui.dtree
             , layer = layui.layer
             , table = layui.table;
 
-        dtree.renderSelect({
-            elem: "#selTree",
-            width: "100%", // 指定树的宽度
-            response: {message: "msg", statusCode: 0},
-            dataStyle: "layuiStyle",
-            selectCardHeight: '170',
-            method: 'GET',
-            url: "{% url 'department:department_list' %}"
-        });
-
-        dtree.on("node('selTree')", function (obj) {
-            $('input[name="department"]').val(obj.param.nodeId);
-        });
-
         table.render({
-            elem: '#LAY-user-manage'
-            , url: '{% url 'user:user_list' %}'
+            elem: '#LAY-role-manage'
+            , url: '{% url 'role:role_list' %}'
             , cols: [[
                 {type: 'checkbox', fixed: 'left'}
-                , {field: 'user_code', width: 100, title: '柜员号', sort: true}
-                , {field: 'username', title: '用户名', minWidth: 100, align: 'center'}
-                , {field: 'role_name', title: '角色名称', minWidth: 100, align: 'center'}
+                , {field: 'id', title: 'id', width: 80, type: 'numbers'}
+                , {field: 'role_name', width: 130, title: '角色名称', sort: true}
                 , {
-                    field: 'gender', title: '性别', width: 100, templet: function (d) {
-                        if (d.gender === 1) {
-                            return '男';
+                    field: 'status', width: 80, title: '状态', align: 'center', templet: function (d) {
+                        if (d.status === 1) {
+                            return '启用';
                         } else {
-                            return '女';
+                            return '未启用';
                         }
-                    }, align: 'center'
+                    }
                 }
-                , {field: 'department_name', title: '部门', align: 'center'}
-                , {field: 'department_code', hide: true}
-                , {title: '操作', width: 150, align: 'center', fixed: 'right', toolbar: '#table-useradmin-webuser'}
+                , {field: 'create_time', title: '创建时间', minWidth: 100}
+                , {field: 'update_time', title: '更新时间', minWidth: 100}
+                , {title: '操作', width: 250, align: 'center', fixed: 'right', toolbar: '#table-useradmin-webuser'}
             ]]
             , page: true
             , limit: 30
@@ -142,15 +90,15 @@
         });
 
         //监听工具条
-        table.on('tool(LAY-user-manage)', function (obj) {
+        table.on('tool(LAY-role-manage)', function (obj) {
             var data = obj.data;
             if (obj.event === 'del') {
                 layer.confirm('真的删除行么', function (index) {
                     $.ajax({
-                        url: '{% url 'user:del_user' %}',
+                        url: '{% url 'role:del_role' %}',
                         type: 'post',
                         dataType: 'json',
-                        data: {'user_code': data.user_code},
+                        data: {'role_id': data.id},
                         success: function (data) {
                             if (data.state === 'success') {
                                 layer.msg(data.message);
@@ -169,14 +117,14 @@
 
                 layer.open({
                     type: 2
-                    , title: '编辑用户'
-                    , content: '{% url 'user:edit_user' %}?user_code=' + data.user_code
+                    , title: '编辑角色'
+                    , content: '{% url 'role:edit_role' %}?role_id=' + data.id
                     , maxmin: true
-                    , area: ['500px', '390px']
+                    , area: ['500px', '350px']
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
                         var iframeWindow = window['layui-layer-iframe' + index]
-                            , submitID = 'LAY-user-front-submit'
+                            , submitID = 'submit_btn'
                             , submit = layero.find('iframe').contents().find('#' + submitID);
 
                         //监听提交
@@ -184,7 +132,7 @@
                             var field = data.field; //获取提交的字段
 
                             $.ajax({
-                                url: '{% url 'user:edit_user' %}',
+                                url: '{% url 'role:edit_role' %}',
                                 data: field,
                                 dataType: 'json',
                                 type: 'post',
@@ -192,7 +140,7 @@
                                     if (data.state === 'success') {
                                         layer.msg(data.message);
                                         setTimeout(function () {
-                                            table.reload('LAY-user-manage'); //数据刷新
+                                            table.reload('LAY-role-manage'); //数据刷新
                                             layer.close(index); //关闭弹层
                                         }, 1000);
                                     } else {
@@ -216,17 +164,18 @@
 
                     }
                 });
+            } else if (obj.event === 'distribute') {
+                layer.open({
+                    type: 2
+                    , title: '按钮分配'
+                    , content: '{% url 'role:roles_button' %}?role_id=' + data.id
+                    , maxmin: true
+                    , area: ['100%', '100%']
+                    , success: function (layero, index) {
+
+                    }
+                });
             }
-        });
-
-        //监听搜索
-        form.on('submit(LAY-user-front-search)', function (data) {
-            var field = data.field;
-
-            //执行重载
-            table.reload('LAY-user-manage', {
-                where: field
-            });
         });
 
         //事件
@@ -234,14 +183,14 @@
             add: function () {
                 layer.open({
                     type: 2
-                    , title: '添加用户'
-                    , content: '{% url 'user:add_user' %}'
+                    , title: '添加角色'
+                    , content: '{% url 'role:add_role' %}'
                     , maxmin: true
-                    , area: ['480px', '390px']
+                    , area: ['480px', '350px']
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
                         var iframeWindow = window['layui-layer-iframe' + index]
-                            , submitID = 'LAY-user-front-submit'
+                            , submitID = 'submit_btn'
                             , submit = layero.find('iframe').contents().find('#' + submitID);
 
                         //监听提交
@@ -249,7 +198,7 @@
                             var field = data.field; //获取提交的字段
 
                             $.ajax({
-                                url: '{% url 'user:add_user' %}',
+                                url: '{% url 'role:add_role' %}',
                                 type: 'post',
                                 dataType: 'json',
                                 data: field,
@@ -257,7 +206,7 @@
                                     if (data.state === 'success') {
                                         layer.msg(data.message);
                                         setTimeout(function () {
-                                            table.reload('LAY-user-manage'); //数据刷新
+                                            table.reload('LAY-role-manage'); //数据刷新
                                             layer.close(index); //关闭弹层
                                         }, 1000);
                                     } else {

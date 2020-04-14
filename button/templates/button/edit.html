@@ -25,9 +25,23 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.button_code.help_text }}</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="button_code" lay-verify="required" autocomplete="off"
+                               placeholder="按钮代码" class="layui-input" value="{{ form.button_code.value }}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">{{ form.button_type.help_text }}</label>
                     <div class="layui-input-block">
                         {{ form.button_type }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <input type="hidden" name="button_icon" value="">
+                    <label class="layui-form-label">{{ form.button_icon.help_text }}</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="iconPicker" lay-filter="iconPicker" class="layui-input">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -54,10 +68,28 @@
         base: '{% static '' %}' //静态资源所在路径
     }).extend({
         index: 'lib/index' //主入口模块
-    }).use(['form', 'element'], function () {
+    }).use(['index', 'form', 'element', 'iconPicker'], function () {
         var $ = layui.$,
             form = layui.form,
+            iconPicker = layui.iconPicker,
             element = layui.element;
+
+        iconPicker.render({
+            // 选择器，推荐使用input
+            elem: '#iconPicker',
+            // 数据类型：fontClass/unicode，推荐使用fontClass
+            type: 'fontClass',
+            // 是否开启搜索：true/false
+            search: true,
+            // 点击回调
+            click: function (data) {
+                $('input[name="button_icon"]').val(data.icon);
+                {#console.log(data);#}
+            }
+        });
+
+        iconPicker.checkIcon('iconPicker', '{{ form.button_icon.value }}');
+
     });
 </script>
 </body>

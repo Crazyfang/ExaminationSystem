@@ -2,7 +2,7 @@ import operator
 from functools import reduce
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, get_user_model
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 import json
 from .form import UserForm, UserFormRegister, UserFormAdd, UserFormEdit
 from captcha.models import CaptchaStore
@@ -10,6 +10,8 @@ from captcha.helpers import captcha_image_url
 from global_login_required import login_not_required
 from .models import User
 from django.db.models import F, Q
+from page.models import Page
+from button.models import Button
 from django.conf import settings
 from django.core import serializers
 
@@ -58,7 +60,7 @@ def register_view(request):
     """
     GET-获取注册界面
     POST-验证注册表单并生成用户
-    :param request:
+    :param request:网页请求
     :return: GET-网页视图
              POST-输入数据符合格式规范-{'state': 'success', 'url': reverse('user:login')}
                   输入数据不符合规范-{'state': 'fail', 'message': user.errors}
@@ -90,7 +92,18 @@ def index_view(request):
     :return: GET-返回视图
     """
     if request.method == 'GET':
-        return render(request, 'myuser/index.html')
+        try:
+            page_code = Page.objects.get(menu_code='user').id
+            button = Button.objects.filter(membership__rolesbutton__role_id=request.user.role.id,
+                                           membership__page_id=page_code)
+            button_external = list(
+                button.filter(button_type=2, status=1).values('button_name', 'button_code', 'button_icon'))
+            button_internal = list(
+                button.filter(button_type=1, status=1).values('button_name', 'button_code', 'button_icon'))
+            return render(request, 'myuser/index.html',
+                          {'button_external': button_external, 'button_internal': button_internal})
+        except Page.DoesNotExist:
+            return HttpResponseNotFound()
 
 
 def user_table(request):
@@ -131,8 +144,9 @@ def user_table(request):
             search_item.append(Q(department=request.GET.get('department')))
 
         user_list = User.objects.all().annotate(department_name=F('department__department_name'),
+                                                role_name=F('role__role_name'),
                                                 department_code=F('department__department_code')). \
-            values('user_code', 'username', 'gender', 'department_code', 'department_name'). \
+            values('user_code', 'username', 'gender', 'department_code', 'department_name', 'role_name'). \
             filter(reduce(operator.and_, search_item))
 
         return_msg = {
@@ -165,7 +179,8 @@ def add_user(request):
                  输入不合法-{'state': 'fail', 'message': user_form.errors}
     """
     if request.method == 'GET':
-        return render(request, 'myuser/add.html')
+        form = UserFormAdd()
+        return render(request, 'myuser/add.html', {'form': form})
     else:
         user_form = UserFormAdd(request.POST)
         if user_form.is_valid():
@@ -191,7 +206,9 @@ def edit_user(request):
     if request.method == 'GET':
         user_code = request.GET.get('user_code')
         form = get_object_or_404(User, user_code=user_code)
-        return render(request, 'myuser/edit.html', {'form': form})
+        user_form = UserFormEdit(initial={'user_code': form.user_code}, instance=form)
+        print(user_form)
+        return render(request, 'myuser/edit.html', {'form': user_form})
     else:
         user_code = request.POST.get('user_code')
         try:

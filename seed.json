@@ -1,0 +1,732 @@
+[
+{
+    "model": "department.department",
+    "pk": "828010",
+    "fields": {
+        "department_name": "\u79d1\u6280\u4fe1\u606f\u90e8",
+        "parent_department": null,
+        "create_time": "2020-03-29T20:20:51Z",
+        "update_time": "2020-03-29T20:20:54Z"
+    }
+},
+{
+    "model": "department.department",
+    "pk": "828020",
+    "fields": {
+        "department_name": "\u4eba\u529b\u8d44\u6e90\u90e8",
+        "parent_department": 828010,
+        "create_time": "2020-03-30T19:54:00Z",
+        "update_time": "2020-04-02T17:14:57.221Z"
+    }
+},
+{
+    "model": "department.department",
+    "pk": "828030",
+    "fields": {
+        "department_name": "\u6570\u5b57\u94f6\u884c\u90e8",
+        "parent_department": 828010,
+        "create_time": "2020-03-30T19:54:25Z",
+        "update_time": "2020-03-30T19:54:29Z"
+    }
+},
+{
+    "model": "department.department",
+    "pk": "828040",
+    "fields": {
+        "department_name": "\u6388\u4fe1\u5ba1\u6279\u90e8",
+        "parent_department": null,
+        "create_time": "2020-03-30T16:15:39.934Z",
+        "update_time": "2020-03-30T16:15:39.934Z"
+    }
+},
+{
+    "model": "department.department",
+    "pk": "828050",
+    "fields": {
+        "department_name": "\u8425\u4e1a\u90e8",
+        "parent_department": null,
+        "create_time": "2020-03-30T16:17:36.034Z",
+        "update_time": "2020-03-30T16:17:36.034Z"
+    }
+},
+{
+    "model": "department.department",
+    "pk": "828060",
+    "fields": {
+        "department_name": "\u8d35\u9a77\u652f\u884c",
+        "parent_department": 828010,
+        "create_time": "2020-03-31T01:52:03.645Z",
+        "update_time": "2020-03-31T01:52:03.645Z"
+    }
+},
+{
+    "model": "myuser.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$180000$683Ycbe8YjZ6$fcsMXc7A9ThX0CUyBe3LpfAfEoJoSudxKATjgYDH8/4=",
+        "last_login": "2020-04-13T02:43:00.697Z",
+        "is_superuser": false,
+        "user_code": "8287072",
+        "username": "\u65b9\u52c712",
+        "gender": 1,
+        "department": "828010",
+        "role": 1,
+        "is_active": true,
+        "is_admin": false,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "myuser.user",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$180000$qdfDX1CteTZr$E7cmbbIWJ+hJoTs9YE04P660uZXifIYiud83SW7L5Qc=",
+        "last_login": "2020-03-31T16:56:05.335Z",
+        "is_superuser": false,
+        "user_code": "8287070",
+        "username": "\u65b9\u52c7",
+        "gender": 1,
+        "department": "828010",
+        "role": 1,
+        "is_active": true,
+        "is_admin": false,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "page.page",
+    "pk": 2,
+    "fields": {
+        "menu_name": "\u7ba1\u7406\u754c\u9762",
+        "menu_url": "#",
+        "menu_code": "home",
+        "create_time": "2020-04-02T14:00:51Z",
+        "status": 1,
+        "order_no": 1,
+        "parent": null
+    }
+},
+{
+    "model": "page.page",
+    "pk": 3,
+    "fields": {
+        "menu_name": "\u7528\u6237\u754c\u9762",
+        "menu_url": "/user/index",
+        "menu_code": "user",
+        "create_time": "2020-04-02T14:01:42Z",
+        "status": 1,
+        "order_no": 1,
+        "parent": 2
+    }
+},
+{
+    "model": "page.page",
+    "pk": 4,
+    "fields": {
+        "menu_name": "\u90e8\u95e8\u8bbe\u7f6e",
+        "menu_url": "/department/index",
+        "menu_code": "department",
+        "create_time": "2020-04-02T14:02:09Z",
+        "status": 1,
+        "order_no": 2,
+        "parent": 2
+    }
+},
+{
+    "model": "page.page",
+    "pk": 5,
+    "fields": {
+        "menu_name": "\u6d4b\u8bd5\u64cd\u4f5c",
+        "menu_url": "#",
+        "menu_code": "test",
+        "create_time": "2020-04-02T14:02:32Z",
+        "status": 1,
+        "order_no": 2,
+        "parent": null
+    }
+},
+{
+    "model": "page.page",
+    "pk": 7,
+    "fields": {
+        "menu_name": "\u6309\u94ae\u5217\u8868",
+        "menu_url": "/button/index",
+        "menu_code": "button",
+        "create_time": "2020-04-02T17:01:18.558Z",
+        "status": 1,
+        "order_no": 3,
+        "parent": 2
+    }
+},
+{
+    "model": "page.page",
+    "pk": 8,
+    "fields": {
+        "menu_name": "\u6d4b\u8bd52",
+        "menu_url": "/test",
+        "menu_code": "test2",
+        "create_time": "2020-04-02T17:07:56.509Z",
+        "status": 1,
+        "order_no": 3,
+        "parent": 5
+    }
+},
+{
+    "model": "page.page",
+    "pk": 9,
+    "fields": {
+        "menu_name": "\u89d2\u8272\u5217\u8868",
+        "menu_url": "/role/index",
+        "menu_code": "role",
+        "create_time": "2020-04-09T03:44:33.674Z",
+        "status": 1,
+        "order_no": 4,
+        "parent": 2
+    }
+},
+{
+    "model": "page.page",
+    "pk": 10,
+    "fields": {
+        "menu_name": "\u9875\u9762\u8bbe\u7f6e",
+        "menu_url": "/page/index",
+        "menu_code": "page",
+        "create_time": "2020-04-09T03:45:39.295Z",
+        "status": 1,
+        "order_no": 5,
+        "parent": 2
+    }
+},
+{
+    "model": "button.button",
+    "pk": 1,
+    "fields": {
+        "button_name": "\u6dfb\u52a0",
+        "button_type": 2,
+        "button_code": "add",
+        "create_time": "2020-04-04T22:09:44Z",
+        "update_time": "2020-04-04T14:29:14.623Z",
+        "status": 1
+    }
+},
+{
+    "model": "button.button",
+    "pk": 2,
+    "fields": {
+        "button_name": "\u7f16\u8f91",
+        "button_type": 1,
+        "button_code": "edit",
+        "create_time": "2020-04-04T22:10:03Z",
+        "update_time": "2020-04-04T22:10:07Z",
+        "status": 1
+    }
+},
+{
+    "model": "button.button",
+    "pk": 3,
+    "fields": {
+        "button_name": "\u5220\u9664",
+        "button_type": 1,
+        "button_code": "del",
+        "create_time": "2020-04-04T22:10:18Z",
+        "update_time": "2020-04-04T22:10:21Z",
+        "status": 1
+    }
+},
+{
+    "model": "button.button",
+    "pk": 4,
+    "fields": {
+        "button_name": "\u67e5\u770b",
+        "button_type": 2,
+        "button_code": "view",
+        "create_time": "2020-04-04T14:26:05.076Z",
+        "update_time": "2020-04-04T14:26:05.076Z",
+        "status": 1
+    }
+},
+{
+    "model": "button.button",
+    "pk": 5,
+    "fields": {
+        "button_name": "\u5206\u914d\u6309\u94ae",
+        "button_type": 1,
+        "button_code": "distribute",
+        "create_time": "2020-04-10T01:46:30.575Z",
+        "update_time": "2020-04-10T01:46:30.575Z",
+        "status": 1
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 13,
+    "fields": {
+        "page": 3,
+        "button": 1,
+        "create_time": "2020-04-08T12:26:54.134Z",
+        "update_time": "2020-04-09T03:41:57.438Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 14,
+    "fields": {
+        "page": 3,
+        "button": 2,
+        "create_time": "2020-04-08T12:26:54.148Z",
+        "update_time": "2020-04-09T03:41:57.446Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 15,
+    "fields": {
+        "page": 3,
+        "button": 4,
+        "create_time": "2020-04-09T02:57:15.890Z",
+        "update_time": "2020-04-09T03:41:57.458Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 16,
+    "fields": {
+        "page": 4,
+        "button": 4,
+        "create_time": "2020-04-09T02:57:21.932Z",
+        "update_time": "2020-04-09T03:41:48.979Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 17,
+    "fields": {
+        "page": 7,
+        "button": 4,
+        "create_time": "2020-04-09T02:57:28.004Z",
+        "update_time": "2020-04-09T03:42:28.418Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 19,
+    "fields": {
+        "page": 8,
+        "button": 4,
+        "create_time": "2020-04-09T02:57:39.963Z",
+        "update_time": "2020-04-09T02:57:39.963Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 20,
+    "fields": {
+        "page": 4,
+        "button": 1,
+        "create_time": "2020-04-09T03:41:48.961Z",
+        "update_time": "2020-04-09T03:41:48.961Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 21,
+    "fields": {
+        "page": 4,
+        "button": 2,
+        "create_time": "2020-04-09T03:41:48.967Z",
+        "update_time": "2020-04-09T03:41:48.967Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 22,
+    "fields": {
+        "page": 4,
+        "button": 3,
+        "create_time": "2020-04-09T03:41:48.973Z",
+        "update_time": "2020-04-09T03:41:48.973Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 23,
+    "fields": {
+        "page": 3,
+        "button": 3,
+        "create_time": "2020-04-09T03:41:57.453Z",
+        "update_time": "2020-04-09T03:41:57.453Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 24,
+    "fields": {
+        "page": 7,
+        "button": 1,
+        "create_time": "2020-04-09T03:42:28.399Z",
+        "update_time": "2020-04-09T03:42:28.399Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 25,
+    "fields": {
+        "page": 7,
+        "button": 2,
+        "create_time": "2020-04-09T03:42:28.407Z",
+        "update_time": "2020-04-09T03:42:28.407Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 26,
+    "fields": {
+        "page": 7,
+        "button": 3,
+        "create_time": "2020-04-09T03:42:28.413Z",
+        "update_time": "2020-04-09T03:42:28.413Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 27,
+    "fields": {
+        "page": 9,
+        "button": 1,
+        "create_time": "2020-04-09T03:44:40.422Z",
+        "update_time": "2020-04-10T02:06:29.806Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 28,
+    "fields": {
+        "page": 9,
+        "button": 2,
+        "create_time": "2020-04-09T03:44:40.429Z",
+        "update_time": "2020-04-10T02:06:29.813Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 29,
+    "fields": {
+        "page": 9,
+        "button": 3,
+        "create_time": "2020-04-09T03:44:40.434Z",
+        "update_time": "2020-04-10T02:06:29.819Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 30,
+    "fields": {
+        "page": 9,
+        "button": 4,
+        "create_time": "2020-04-09T03:44:40.441Z",
+        "update_time": "2020-04-10T02:06:29.826Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 31,
+    "fields": {
+        "page": 10,
+        "button": 1,
+        "create_time": "2020-04-09T03:45:47.237Z",
+        "update_time": "2020-04-10T01:47:25.839Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 32,
+    "fields": {
+        "page": 10,
+        "button": 2,
+        "create_time": "2020-04-09T03:45:47.246Z",
+        "update_time": "2020-04-10T01:47:25.847Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 33,
+    "fields": {
+        "page": 10,
+        "button": 3,
+        "create_time": "2020-04-09T03:45:47.252Z",
+        "update_time": "2020-04-10T01:47:25.854Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 34,
+    "fields": {
+        "page": 10,
+        "button": 4,
+        "create_time": "2020-04-09T03:45:47.258Z",
+        "update_time": "2020-04-10T01:47:25.860Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 35,
+    "fields": {
+        "page": 10,
+        "button": 5,
+        "create_time": "2020-04-10T01:47:25.865Z",
+        "update_time": "2020-04-10T01:47:25.865Z"
+    }
+},
+{
+    "model": "button.membership",
+    "pk": 36,
+    "fields": {
+        "page": 9,
+        "button": 5,
+        "create_time": "2020-04-10T02:06:29.833Z",
+        "update_time": "2020-04-10T02:06:29.833Z"
+    }
+},
+{
+    "model": "role.role",
+    "pk": 1,
+    "fields": {
+        "role_name": "\u7ba1\u7406\u5458",
+        "status": 1,
+        "create_time": "2020-04-08T10:41:24Z",
+        "update_time": "2020-04-08T10:41:28Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 16,
+    "fields": {
+        "role": 1,
+        "button": 19,
+        "create_time": "2020-04-09T02:58:43.086Z",
+        "update_time": "2020-04-09T02:58:43.086Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 18,
+    "fields": {
+        "role": 1,
+        "button": 20,
+        "create_time": "2020-04-09T03:46:08.848Z",
+        "update_time": "2020-04-09T03:46:08.848Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 19,
+    "fields": {
+        "role": 1,
+        "button": 21,
+        "create_time": "2020-04-09T03:46:08.854Z",
+        "update_time": "2020-04-09T03:46:08.854Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 20,
+    "fields": {
+        "role": 1,
+        "button": 22,
+        "create_time": "2020-04-09T03:46:08.858Z",
+        "update_time": "2020-04-09T03:46:08.858Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 21,
+    "fields": {
+        "role": 1,
+        "button": 24,
+        "create_time": "2020-04-09T03:46:08.862Z",
+        "update_time": "2020-04-09T03:46:08.862Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 22,
+    "fields": {
+        "role": 1,
+        "button": 25,
+        "create_time": "2020-04-09T03:46:08.867Z",
+        "update_time": "2020-04-09T03:46:08.868Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 24,
+    "fields": {
+        "role": 1,
+        "button": 27,
+        "create_time": "2020-04-09T03:46:08.876Z",
+        "update_time": "2020-04-09T03:46:08.876Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 25,
+    "fields": {
+        "role": 1,
+        "button": 28,
+        "create_time": "2020-04-09T03:46:08.879Z",
+        "update_time": "2020-04-09T03:46:08.879Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 26,
+    "fields": {
+        "role": 1,
+        "button": 29,
+        "create_time": "2020-04-09T03:46:08.881Z",
+        "update_time": "2020-04-09T03:46:08.881Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 27,
+    "fields": {
+        "role": 1,
+        "button": 31,
+        "create_time": "2020-04-09T03:46:08.884Z",
+        "update_time": "2020-04-09T03:46:08.884Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 28,
+    "fields": {
+        "role": 1,
+        "button": 32,
+        "create_time": "2020-04-09T03:46:08.890Z",
+        "update_time": "2020-04-09T03:46:08.890Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 29,
+    "fields": {
+        "role": 1,
+        "button": 33,
+        "create_time": "2020-04-09T03:46:08.894Z",
+        "update_time": "2020-04-09T03:46:08.894Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 32,
+    "fields": {
+        "role": 1,
+        "button": 35,
+        "create_time": "2020-04-10T09:54:37Z",
+        "update_time": "2020-04-10T09:54:40Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 35,
+    "fields": {
+        "role": 1,
+        "button": 30,
+        "create_time": "2020-04-10T06:46:16.555Z",
+        "update_time": "2020-04-10T06:46:16.555Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 36,
+    "fields": {
+        "role": 1,
+        "button": 36,
+        "create_time": "2020-04-10T06:46:16.571Z",
+        "update_time": "2020-04-10T06:46:16.571Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 37,
+    "fields": {
+        "role": 1,
+        "button": 34,
+        "create_time": "2020-04-10T06:46:16.588Z",
+        "update_time": "2020-04-10T06:46:16.588Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 38,
+    "fields": {
+        "role": 1,
+        "button": 16,
+        "create_time": "2020-04-13T02:13:43.179Z",
+        "update_time": "2020-04-13T02:13:43.179Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 39,
+    "fields": {
+        "role": 1,
+        "button": 17,
+        "create_time": "2020-04-13T02:13:43.207Z",
+        "update_time": "2020-04-13T02:13:43.207Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 40,
+    "fields": {
+        "role": 1,
+        "button": 26,
+        "create_time": "2020-04-13T02:13:43.220Z",
+        "update_time": "2020-04-13T02:13:43.220Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 41,
+    "fields": {
+        "role": 1,
+        "button": 13,
+        "create_time": "2020-04-13T02:28:52.827Z",
+        "update_time": "2020-04-13T02:28:52.827Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 42,
+    "fields": {
+        "role": 1,
+        "button": 14,
+        "create_time": "2020-04-13T02:28:52.838Z",
+        "update_time": "2020-04-13T02:28:52.838Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 43,
+    "fields": {
+        "role": 1,
+        "button": 15,
+        "create_time": "2020-04-13T02:28:52.845Z",
+        "update_time": "2020-04-13T02:28:52.845Z"
+    }
+},
+{
+    "model": "role.rolesbutton",
+    "pk": 44,
+    "fields": {
+        "role": 1,
+        "button": 23,
+        "create_time": "2020-04-13T02:29:07.848Z",
+        "update_time": "2020-04-13T02:29:07.848Z"
+    }
+}
+]

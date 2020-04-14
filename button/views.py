@@ -1,15 +1,25 @@
 from django.shortcuts import render
-from .models import Button
+from .models import Button, Membership
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from .forms import ButtonEditForm, ButtonAddForm
 import json
+from page.models import Page
 
 
 # Create your views here.
 def index_view(request):
     if request.method == 'GET':
-        return render(request, 'button/index.html')
+        try:
+            page_code = Page.objects.get(menu_code='button').id
+            button = Button.objects.filter(membership__rolesbutton__role_id=request.user.role.id,
+                                           membership__page_id=page_code)
+            button_external = list(button.filter(button_type=2).values('button_name', 'button_code', 'button_icon'))
+            button_internal = list(button.filter(button_type=1).values('button_name', 'button_code', 'button_icon'))
+            return render(request, 'button/index.html',
+                          {'button_external': button_external, 'button_internal': button_internal})
+        except Page.DoesNotExist:
+            return HttpResponseNotFound()
 
 
 def button_list(request):
@@ -24,8 +34,14 @@ def button_list(request):
         begin = (page - 1) * limit
         end = begin + limit - 1
 
-        button_value = Button.objects.all().values('id', 'button_name', 'button_type', 'create_time', 'status')[
-                       begin:end]
+        button_value = Button.objects.all().extra(
+            select={"create_time": "DATE_FORMAT(create_time, '%%Y-%%m-%%d %%H:%%i:%%s')"}).values('id',
+                                                                                                  'button_name',
+                                                                                                  'button_code',
+                                                                                                  'button_type',
+                                                                                                  'button_icon',
+                                                                                                  'create_time',
+                                                                                                  'status')[begin:end]
 
         return_msg = {
             "code": 0,
@@ -80,3 +96,46 @@ def add_button(request):
     else:
         button = ButtonAddForm()
         return render(request, 'button/add.html', {'form': button})
+
+
+def button_distribute(request):
+    if request.method == 'GET':
+        page_id = request.GET.get('page_id')
+        if page_id:
+            button_gather = Button.objects.all()
+            button_checked = list(Button.objects.filter(membership__page_id=page_id).values_list('id', flat=True))
+            return render(request, 'button/button_list.html',
+                          {'form': button_gather, 'checked': button_checked, 'page_id': page_id})
+        else:
+            return HttpResponseNotFound()
+    else:
+        page_id = request.POST.get('page_id')
+        if page_id:
+            page = Page.objects.get(pk=page_id)
+            button_old_list = list(Button.objects.filter(membership__page=page).values_list('id', flat=True))
+            print(button_old_list)
+            print(json.loads(request.POST.get('button_id')))
+
+            for id in json.loads(request.POST.get('button_id')):
+                if button_old_list.count(id):
+                    button_old_list.remove(id)
+                else:
+                    button = Button.objects.get(pk=id)
+                    membership = Membership.objects.update_or_create(page=page, button=button)
+            for item in button_old_list:
+                membership = Membership.objects.filter(button_id=item, page=page)
+                membership.delete()
+            # for key, value in request.POST.items():
+            #     print(key)
+            #     if key.split('_')[0] == 'button':
+            #         button_id = key.split('_')[1]
+            #         if button_old_list.count(int(button_id)):
+            #             button_old_list.remove(int(button_id))
+            #         button = Button.objects.get(pk=button_id)
+            #         membership = Membership.objects.update_or_create(page=page, button=button)
+            # for item in button_old_list:
+            #     membership = Membership.objects.filter(button_id=item, page=page)
+            #     membership.delete()
+            return HttpResponse(json.dumps({'state': 'success', 'message': '分配成功!'}))
+        else:
+            return HttpResponse(json.dumps({'state': 'fail', 'message': '页面编号丢失，请重新刷新后重试!'}))

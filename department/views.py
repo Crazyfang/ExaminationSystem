@@ -5,6 +5,8 @@ from django.http import HttpResponse, Http404
 import json
 from .forms import DepartmentCreateForm, DepartmentEditForm
 from django.core.exceptions import ObjectDoesNotExist
+from page.models import Page
+from button.models import Button
 
 
 # Create your views here.
@@ -23,7 +25,11 @@ def get_department(department_code):
 
 def index_view(request):
     if request.method == 'GET':
-        return render(request, 'department/index.html')
+        page_code = Page.objects.get(menu_code='department').id
+        button = list(Button.objects.filter(membership__rolesbutton__role_id=request.user.role.id,
+                                            membership__page_id=page_code).values('button_name', 'button_code',
+                                                                                  'button_icon'))
+        return render(request, 'department/index.html', {'button_list': button})
 
 
 def department_list(request):

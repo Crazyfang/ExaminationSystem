@@ -9,16 +9,22 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}" media="all">
-    <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">
+{#    <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">#}
 </head>
 <body>
 <div class="layui-fluid">
-    <div class="layui-card">
-        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+    <div class="layui-card" style="margin-top: 20px">
+        <div class="layui-form layui-card-header" style="height: auto">
             <div class="layui-form-item">
                 <div class="layui-inline">
-                    <div style="padding-bottom: 10px;">
-                        <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+                    <div style="margin-top: 10px">
+                        {% for button in button_external %}
+                            {% if button.button_code != 'view' %}
+                                <button class="layui-btn layui-btn-lg" data-type="{{ button.button_code }}" type="button">
+                                    <i class="layui-icon {{ button.button_icon }}"></i>{{ button.button_name }}
+                                </button>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -27,10 +33,16 @@
         <div class="layui-card-body">
             <table id="LAY-button-manage" lay-filter="LAY-button-manage"></table>
             <script type="text/html" id="bar">
-                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
-                        class="layui-icon layui-icon-edit"></i>编辑</a>
-                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
-                        class="layui-icon layui-icon-delete"></i>删除</a>
+                {% for button in button_internal %}
+                    <a class="layui-btn layui-btn-normal {% cycle 'layui-btn-normal' 'layui-btn-danger' %} layui-btn-xs"
+                       lay-event="{{ button.button_code }}">
+                        <i class="layui-icon {{ button.button_icon }}"></i>{{ button.button_name }}
+                    </a>
+                {% endfor %}
+                {#                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i#}
+                {#                        class="layui-icon layui-icon-edit"></i>编辑</a>#}
+                {#                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i#}
+                {#                        class="layui-icon layui-icon-delete"></i>删除</a>#}
             </script>
         </div>
     </div>
@@ -57,6 +69,12 @@
             , cols: [[
                 {field: 'id', title: 'id', width: 80, type: 'numbers'}
                 , {field: 'button_name', title: '按钮名称'}
+                , {field: 'button_code', title: '按钮代码'}
+                , {
+                    field: 'button_icon', title: '按钮图标', templet: function (d) {
+                        return "<i class='layui-icon " + d.button_icon + "'></i>";
+                    }, align: 'center'
+                }
                 , {
                     field: 'button_type', title: '按钮类型', templet: function (d) {
                         if (d.button_type === 1) {
@@ -66,7 +84,7 @@
                         }
                     }, align: 'center'
                 }
-                , {field: 'create_time', title: '创建时间'}
+                , {field: 'create_time', title: '创建时间', width: 170}
                 , {
                     field: 'status',
                     title: '状态',
@@ -117,9 +135,9 @@
                 layer.open({
                     type: 2
                     , title: '编辑按钮'
-                    , content: '{% url 'button:edit_button' %}?button_id='+data.id
+                    , content: '{% url 'button:edit_button' %}?button_id=' + data.id
                     , maxmin: true
-                    , area: ['500px', '350px']
+                    , area: ['500px', '380px']
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
                         var iframeWindow = window['layui-layer-iframe' + index]
@@ -174,7 +192,7 @@
                     , title: '添加按钮'
                     , content: '{% url 'button:add_button' %}'
                     , maxmin: true
-                    , area: ['480px', '350px']
+                    , area: ['480px', '380px']
                     , btn: ['确定', '取消']
                     , yes: function (index, layero) {
                         var iframeWindow = window['layui-layer-iframe' + index]
@@ -218,7 +236,7 @@
             }
         };
 
-        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function () {
+        $('.layui-card-header .layui-btn').on('click', function () {
             var type = $(this).data('type');
             active[type] ? active[type].call(this) : '';
         });

@@ -24,4 +24,5 @@ urlpatterns = [
     path('department/', include('department.urls')),
     path('page/', include('page.urls')),
     path('button/', include('button.urls')),
+    path('role/', include('role.urls')),
 ]

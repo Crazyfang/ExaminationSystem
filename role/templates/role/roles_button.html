@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>分配按钮</title>
+    <meta name="renderer" content="webkit">
+    {% load static %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="{% static 'layui/css/layui.css' %}" media="all">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div>
+                <a href="javascript:;" class="layui-btn" id="btnFold">
+                    <i class="layui-icon">&#xe608;</i> 全部折叠/展开
+                </a>
+                <a href="javascript:;" class="layui-btn" id="btnSave">
+                    <i class="layui-icon">&#xe608;</i> 保存设置
+                </a>
+            </div>
+            <input type="hidden" id="role_id" value="{{ role_id }}"/>
+        </div>
+
+        <div class="layui-card-body">
+            <table id="tbMenu" lay-filter="LAY-button-manage"></table>
+            <script type="text/html" id="bar">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="selectAll">全选</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="cancleSelectAll">反选</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'layui/layui.js' %}"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/csrf.js' %}"></script>
+<script>
+    layui.config({
+        base: '{% static '' %}' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'treeGrid', 'form', 'layer'], function () {
+        var $ = layui.$
+            , form = layui.form
+            , treeGrid = layui.treeGrid
+            , layer = layui.layer;
+
+        var treeTable = treeGrid.render({
+            id: 'tbReload'
+            , elem: '#tbMenu'
+            , height: 'full-200' //高度最大化减去差值
+            , url: '{% url 'role:role_page_button' %}'
+            , page: false //开启分页
+            , cellMinWidth: 200
+            , idField: 'id'
+            , where: {'role_id': {{ role_id }}}
+            , treeId: 'id'//树形id字段名称
+            , treeUpId: 'parent_id'//树形父id字段名称
+            , treeShowName: 'menu_name'//以树形式显示的字段
+            , method: 'get'
+            , cols: [[ //表头
+                //{ checkbox: true },
+                {field: 'id', title: 'id', type: 'numbers'}
+                , {field: 'menu_name', title: '菜单名称'}
+                , {field: 'menu_url', title: '菜单路径'}
+                , {title: '拥有按钮', width: 350, templet: '<div>{% verbatim %}{{ d.button }}{% endverbatim %}</div>'
+                }
+                , {field: 'create_time', title: '创建时间'}
+                , {
+                    field: 'status', title: '状态', templet: function (d) {
+                        if (d.status === 1) {
+                            return '启用';
+                        } else {
+                            return '未启用';
+                        }
+                    }, align: 'center', width: 80
+                }
+                , {field: 'order_no', title: '排序号', align: 'center', width: 80}
+                , {field: '', title: '操作', toolbar: "#bar", width: 150}
+            ]]
+        });
+
+
+        //监听工具条
+        treeGrid.on('tool(LAY-button-manage)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'selectAll') {  //全选
+                $("input[name='cbx_" + data.id + "']").prop("checked", true);
+            } else if (obj.event === 'cancleSelectAll') {//反选
+                $("input[name='cbx_" + data.id + "']").prop("checked", false);
+            }
+            form.render('checkbox');
+        });
+
+        //折叠展开
+        $("#btnFold").on('click', function () {
+            $(".layui-tree-head").click();
+        });
+
+        //关闭页面
+        function CloseWin() {
+            parent.location.reload(); // 父页面刷新
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭
+        }
+
+        //保存设置
+        $("#btnSave").on('click', function () {
+            var _roleId = $("#role_id").val();
+            var cbxs = $(".layui-table").find('tbody input[type="checkbox"]');
+            var _list = [];
+            cbxs.each(function (index, item) {
+                if (item.checked === true) {
+                    var _row = {MenuId: 0, RoleId: 0, ActionId: 0};
+                    var _name = item.name;//chx_2
+                    if (_name.indexOf('cbx_') > -1) {
+                        _name = _name.replace('cbx_', '');
+                    } else {
+                        _name = item.getAttribute('tag');
+                        if (_name.indexOf('cbx_') > -1) {
+                            _name = _name.replace('cbx_', '');
+                        }
+                    }
+                    _row.MenuId = _name;
+                    _row.ActionId = item.value === "on" ? null : item.value;
+                    _row.RoleId = _roleId;
+                    _list.push(_row);
+                }
+            });
+            $.ajax({
+                url: "{% url 'role:roles_button' %}",
+                type: "POST",
+                //traditional: true,
+                data: {'list': JSON.stringify(_list), 'role_id': _roleId},
+                dataType: "json",
+                success: function (data) {
+                    if (data.state === "success") {
+                        layer.msg(data.message);
+                        setTimeout(CloseWin, 1500);
+                    } else {
+                        if (typeof (data.message) === 'object') {
+                            var msg = '';
+                            for (var temp in data.message) {
+                                msg += data.message[temp].join('<br>');
+                            }
+                            layer.msg(msg);
+                        } else {
+                            layer.msg(data.message)
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -40,6 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     gender = models.IntegerField(choices=GENDER_CHOICES, default=1, verbose_name='性别')
     department = models.ForeignKey('department.Department', on_delete=models.SET_NULL, null=True, blank=True,
                                    to_field='department_code')
+    role = models.ForeignKey('role.Role', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='角色',
+                             help_text='角色')
     is_active = models.BooleanField(default=True, verbose_name='是否激活')
     is_admin = models.BooleanField(default=False, verbose_name='是否允许访问管理界面')
 

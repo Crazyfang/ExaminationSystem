@@ -12,6 +12,8 @@ class Page(models.Model):
     ]
     menu_name = models.CharField(max_length=50, verbose_name='菜单名称', help_text='菜单名称')
     menu_url = models.CharField(max_length=200, verbose_name='链接', help_text='链接')
+    menu_code = models.CharField(max_length=20, verbose_name='菜单代码', help_text='菜单代码')
+    menu_icon = models.CharField(max_length=100, verbose_name='菜单图标', help_text='菜单图标', null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
     status = models.IntegerField(choices=STATUS_CHOICES, default=1, verbose_name='状态', help_text='状态')
     order_no = models.IntegerField(default=1, verbose_name='排序号', help_text='排序号')
